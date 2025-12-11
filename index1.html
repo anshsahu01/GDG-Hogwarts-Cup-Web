@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GDG Spellbound | Mischief Managed</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Cinzel for Headers, IM Fell DW Pica for Marauder's Map, Inter for UI -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=IM+Fell+DW+Pica:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'serif'],
+                        map: ['"IM Fell DW Pica"', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        parchment: "#F5E6C8",
+                        ink: "#2C1810",
+                        gold: "#C5A059",
+                        gryffindor: "#740001",
+                        hufflepuff: "#ECB939",
+                        ravenclaw: "#0E1A40",
+                        slytherin: "#1A472A",
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'footprints': 'footprints 4s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        footprints: {
+                            '0%': { strokeDashoffset: '1000' },
+                            '100%': { strokeDashoffset: '0' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Lumos Cursor Effect */
+        #lumos-cursor {
+            background: radial-gradient(400px circle at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, 0.1), transparent 60%);
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 50;
+            mix-blend-mode: overlay;
+        }
+
+        /* Parchment Texture for Map */
+        .bg-parchment {
+            background-color: #dcbfa6;
+            background-image: url("https://www.transparenttextures.com/patterns/aged-paper.png");
+            box-shadow: inset 0 0 150px rgba(0,0,0,0.5);
+        }
+
+        /* Ink Reveal Animation */
+        .ink-reveal {
+            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+            animation: revealInk 1s forwards ease-in-out;
+        }
+        
+        .ink-reveal.visible {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        /* Footprint Path Animation */
+        .footpath {
+            stroke-dasharray: 20;
+            animation: dash 20s linear infinite;
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -1000;
+            }
+        }
+
+        /* Scroll Animation Classes */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-gold/30 selection:text-white">
+
+    <!-- Lumos Cursor -->
+    <div id="lumos-cursor"></div>
+
+    <!-- Background Ambience -->
+    <div class="fixed inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none z-0"></div>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-40 transition-all duration-300 py-6">
+        <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
+            <div class="flex items-center gap-3 group cursor-pointer">
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 3L2 12L8 21M16 3L22 12L16 21" stroke="#FFD700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="text-xl font-cinzel font-bold text-white tracking-widest border-b border-transparent group-hover:border-gold transition-colors">GDGC UIT</span>
+            </div>
+
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#map" class="text-sm font-cinzel font-semibold text-gray-400 hover:text-gold transition-colors">The Map</a>
+                <a href="#houses" class="text-sm font-cinzel font-semibold text-gray-400 hover:text-gold transition-colors">Houses</a>
+                <a href="#tracks" class="text-sm font-cinzel font-semibold text-gray-400 hover:text-gold transition-colors">Tracks</a>
+                <button class="px-8 py-2 border border-gold/30 text-gold font-cinzel font-bold text-sm hover:bg-gold hover:text-black transition-all duration-300 tracking-wider">
+                    Register
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="relative z-10">
+        
+        <!-- Cinematic Hero Section -->
+        <section class="min-h-screen flex items-center justify-center relative overflow-hidden">
+            <!-- Mystical Fog/Smoke Video or Effect would go here, simulated with gradients -->
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-[#050505] z-10"></div>
+            
+            <div class="container mx-auto px-6 text-center relative z-20">
+                <div class="reveal-on-scroll mb-6">
+                    <span class="text-gold font-cinzel tracking-[0.3em] text-sm uppercase">The Wizarding Hackathon</span>
+                </div>
+
+                <h1 class="reveal-on-scroll text-6xl md:text-9xl font-cinzel font-bold leading-tight mb-8 text-white drop-shadow-[0_0_15px_rgba(197,160,89,0.3)]" style="transition-delay: 100ms;">
+                    The Hogwarts <br />
+                    <span class="text-transparent bg-clip-text bg-gradient-to-b from-gold to-[#6b5220]">Cup</span>
+                </h1>
+
+                <p class="reveal-on-scroll text-xl text-gray-300 max-w-2xl mx-auto mb-12 font-map italic" style="transition-delay: 200ms;">
+                    "Presented by GDG UIT" <br>
+                    Hack, Learn, and Create the Future of Technology.
+                </p>
+
+                <div class="reveal-on-scroll flex flex-col sm:flex-row items-center justify-center gap-6" style="transition-delay: 300ms;">
+                    <a href="#map" class="group relative px-8 py-4 bg-transparent border border-white/20 text-white font-cinzel tracking-widest overflow-hidden">
+                        <span class="relative z-10 group-hover:text-black transition-colors duration-300">Open The Map</span>
+                        <div class="absolute inset-0 bg-white transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- THE MARAUDER'S MAP (Timeline) -->
+        <section id="map" class="py-20 relative bg-parchment overflow-hidden">
+            <!-- Fold Lines -->
+            <div class="absolute top-0 bottom-0 left-1/4 w-px bg-black/10 shadow-[0_0_10px_rgba(0,0,0,0.2)]"></div>
+            <div class="absolute top-0 bottom-0 right-1/4 w-px bg-black/10 shadow-[0_0_10px_rgba(0,0,0,0.2)]"></div>
+            
+            <!-- Map Background Details (Floating Room Names) -->
+            <div class="absolute top-20 left-10 text-ink/20 font-map text-2xl rotate-[-15deg] pointer-events-none select-none">Divination Tower</div>
+            <div class="absolute bottom-40 right-20 text-ink/20 font-map text-2xl rotate-[10deg] pointer-events-none select-none">The Dungeons</div>
+            <div class="absolute top-1/3 right-10 text-ink/20 font-map text-xl rotate-[5deg] pointer-events-none select-none">Grand Staircase</div>
+            <div class="absolute bottom-1/4 left-20 text-ink/20 font-map text-xl rotate-[-5deg] pointer-events-none select-none">Forbidden Forest</div>
+
+            <div class="container mx-auto px-6 relative z-10">
+                <div class="text-center mb-16">
+                    <h2 class="text-5xl md:text-7xl font-map font-bold text-ink mb-4 tracking-tighter">The Marauder's Map</h2>
+                    <p class="font-map text-xl text-ink/80 italic">- Timeline of Events -</p>
+                </div>
+
+                <div class="relative max-w-4xl mx-auto">
+                    <!-- SVG Winding Path -->
+                    <svg class="absolute top-0 left-0 w-full h-full pointer-events-none opacity-40 md:opacity-100" viewBox="0 0 800 1200" preserveAspectRatio="none">
+                        <!-- The Path -->
+                        <path class="footpath" d="M 400 50 C 400 150, 100 150, 100 300 C 100 450, 700 450, 700 600 C 700 750, 400 750, 400 900 C 400 1050, 100 1050, 100 1150" 
+                              fill="none" stroke="#4A0404" stroke-width="2" stroke-dasharray="10,10" />
+                        
+                        <!-- Animated Footprints -->
+                        <circle r="4" fill="#4A0404">
+                            <animateMotion dur="12s" repeatCount="indefinite" path="M 400 50 C 400 150, 100 150, 100 300 C 100 450, 700 450, 700 600 C 700 750, 400 750, 400 900 C 400 1050, 100 1050, 100 1150" />
+                        </circle>
+                        <circle r="4" fill="#4A0404">
+                            <animateMotion dur="12s" begin="0.5s" repeatCount="indefinite" path="M 400 50 C 400 150, 100 150, 100 300 C 100 450, 700 450, 700 600 C 700 750, 400 750, 400 900 C 400 1050, 100 1050, 100 1150" />
+                        </circle>
+                    </svg>
+
+                    <!-- Timeline Events -->
+                    <div class="relative grid gap-24 py-10">
+                        <!-- Event 1 -->
+                        <div class="reveal-on-scroll flex flex-col md:flex-row items-center justify-between text-ink group">
+                            <div class="md:w-5/12 text-right pr-8">
+                                <h3 class="text-3xl font-map font-bold">Arrival of the Express</h3>
+                                <p class="font-map italic text-lg opacity-80">Platform 9 3/4 • Registration</p>
+                            </div>
+                            <div class="w-8 h-8 rounded-full border-4 border-ink bg-parchment z-20 relative group-hover:scale-125 transition-transform flex items-center justify-center">
+                                <div class="w-2 h-2 bg-ink rounded-full"></div>
+                            </div>
+                            <div class="md:w-5/12 pl-8">
+                                <span class="font-cinzel font-bold text-xl border-b border-ink/30">Oct 26 • 09:00 AM</span>
+                            </div>
+                        </div>
+
+                        <!-- Event 2 -->
+                        <div class="reveal-on-scroll flex flex-col md:flex-row-reverse items-center justify-between text-ink group">
+                            <div class="md:w-5/12 text-left pl-8">
+                                <h3 class="text-3xl font-map font-bold">The Sorting Ceremony</h3>
+                                <p class="font-map italic text-lg opacity-80">Great Hall • Team Formation</p>
+                            </div>
+                            <div class="w-8 h-8 rounded-full border-4 border-ink bg-parchment z-20 relative group-hover:scale-125 transition-transform flex items-center justify-center">
+                                <div class="w-2 h-2 bg-ink rounded-full"></div>
+                            </div>
+                            <div class="md:w-5/12 text-right pr-8">
+                                <span class="font-cinzel font-bold text-xl border-b border-ink/30">Oct 26 • 10:30 AM</span>
+                            </div>
+                        </div>
+
+                        <!-- Event 3 -->
+                        <div class="reveal-on-scroll flex flex-col md:flex-row items-center justify-between text-ink group">
+                            <div class="md:w-5/12 text-right pr-8">
+                                <h3 class="text-3xl font-map font-bold">Start of Term</h3>
+                                <p class="font-map italic text-lg opacity-80">Room of Requirement • Hacking Begins</p>
+                            </div>
+                            <div class="w-8 h-8 rounded-full border-4 border-ink bg-parchment z-20 relative group-hover:scale-125 transition-transform flex items-center justify-center">
+                                <div class="w-2 h-2 bg-ink rounded-full"></div>
+                            </div>
+                            <div class="md:w-5/12 pl-8">
+                                <span class="font-cinzel font-bold text-xl border-b border-ink/30">Oct 26 • 11:30 AM</span>
+                            </div>
+                        </div>
+
+                        <!-- Event 4 -->
+                        <div class="reveal-on-scroll flex flex-col md:flex-row-reverse items-center justify-between text-ink group">
+                            <div class="md:w-5/12 text-left pl-8">
+                                <!-- CHANGE THE EVENT TITLE BELOW -->
+                                <h3 class="text-3xl font-map font-bold">The Midnight Feast</h3>
+                                
+                                <!-- CHANGE THE LOCATION/DESCRIPTION BELOW -->
+                                <p class="font-map italic text-lg opacity-80">The Kitchens • Late Night Pizza</p>
+                            </div>
+                            <div class="w-8 h-8 rounded-full border-4 border-ink bg-parchment z-20 relative group-hover:scale-125 transition-transform flex items-center justify-center">
+                                <div class="w-2 h-2 bg-ink rounded-full"></div>
+                            </div>
+                            <div class="md:w-5/12 text-right pr-8">
+                                <!-- CHANGE THE TIME BELOW -->
+                                <span class="font-cinzel font-bold text-xl border-b border-ink/30">Oct 27 • 12:00 AM</span>
+                            </div>
+                        </div>
+
+                         <!-- Event 5 -->
+                         <div class="reveal-on-scroll flex flex-col md:flex-row items-center justify-between text-ink group">
+                            <div class="md:w-5/12 text-right pr-8">
+                                <h3 class="text-3xl font-map font-bold">O.W.L.s Examination</h3>
+                                <p class="font-map italic text-lg opacity-80">Ministry Atrium • Project Demos</p>
+                            </div>
+                            <div class="w-8 h-8 rounded-full border-4 border-ink bg-parchment z-20 relative group-hover:scale-125 transition-transform flex items-center justify-center">
+                                <div class="w-2 h-2 bg-ink rounded-full"></div>
+                            </div>
+                            <div class="md:w-5/12 pl-8">
+                                <span class="font-cinzel font-bold text-xl border-b border-ink/30">Oct 27 • 03:00 PM</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Floating Label -->
+                <div class="absolute bottom-4 right-10 text-ink/40 font-map rotate-[-5deg] text-lg">
+                    Messrs Moony, Wormtail, Padfoot, and Prongs are proud to present the Hackathon Timeline.
+                </div>
+            </div>
+        </section>
+
+        <!-- Houses Section -->
+        <section id="houses" class="py-32 relative bg-[#050505]">
+            <div class="container mx-auto px-6">
+                <div class="reveal-on-scroll text-center mb-16">
+                    <h2 class="text-4xl md:text-6xl font-cinzel font-bold mb-4 text-white">Choose Your House</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    
+                    <!-- Gryffindor -->
+                    <div class="reveal-on-scroll house-card group relative h-[400px] overflow-hidden rounded-sm border border-white/10 transition-all duration-500 hover:border-gryffindor cursor-pointer" style="transition-delay: 0ms;">
+                        <div class="absolute inset-0 bg-gradient-to-t from-gryffindor/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGzOgfesEVOJJ-Yys1rojpco3mgstF22CxSu9dxvARpNfwrtfr5VHBRUwTAkm7LyYPrjx0WrhEpKgi9cXaY6daJAIkdZ6POR0pl0ZW5TLamzRKoaKu4bc7PxQ1k4aD5TkEFEb5lAseO3EH6ykkQEp8KJRQD5IOZx9yngsO8O9VasNIS_fsaXpMYuPGo2M8fyq8NApAbEIdosLrYRjC-PAdXBj6QQafQM4hIKLdaU0PMFLxQ9Ox7D9pAB_0udeI3dlQI-OSbu4zTA" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 opacity-40 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 blur-[1px] group-hover:blur-0 grayscale group-hover:grayscale-0">
+                        
+                        <div class="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 transition-transform">
+                            <h3 class="text-2xl font-cinzel font-bold text-white mb-2 text-center">Gryffindor</h3>
+                            <p class="text-gray-400 text-xs text-center opacity-0 group-hover:opacity-100 transition-opacity delay-100 font-sans">Brave at heart. Daring nerve and chivalry.</p>
+                        </div>
+                    </div>
+
+                    <!-- Hufflepuff -->
+                    <div class="reveal-on-scroll house-card group relative h-[400px] overflow-hidden rounded-sm border border-white/10 transition-all duration-500 hover:border-hufflepuff cursor-pointer" style="transition-delay: 100ms;">
+                        <div class="absolute inset-0 bg-gradient-to-t from-hufflepuff/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHwMsyplCNrtyD8pu4bOTCfZL0scQJSYMFEOyK4LIBFlJ2Ea0hRIaj5dQwo7ShGzLsl4nJ6p6XYkPrLi9pJT9T0_9pUe0kHgrDklAwSs44Nt7oKLXO2VZVfAddJhOom8XtCgI2TvjgZNT8PUHK-KGJ9j65000KlIyC-EJ2KMh5Qf72hLNJLhHwNfkfH4sonN7UXHFaNto3OkvyGder0z5t7hLYsNPqLNJCt0HW03rXcw2Q3P752yvxi7E0i-wtG1_u_wFDUdJRCw" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 opacity-40 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 blur-[1px] group-hover:blur-0 grayscale group-hover:grayscale-0">
+                        
+                        <div class="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 transition-transform">
+                            <h3 class="text-2xl font-cinzel font-bold text-white mb-2 text-center">Hufflepuff</h3>
+                            <p class="text-gray-400 text-xs text-center opacity-0 group-hover:opacity-100 transition-opacity delay-100 font-sans">Just and loyal. Patience and hard work.</p>
+                        </div>
+                    </div>
+
+                    <!-- Ravenclaw -->
+                    <div class="reveal-on-scroll house-card group relative h-[400px] overflow-hidden rounded-sm border border-white/10 transition-all duration-500 hover:border-ravenclaw cursor-pointer" style="transition-delay: 200ms;">
+                        <div class="absolute inset-0 bg-gradient-to-t from-ravenclaw/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyX6YLy305ikcGmZ8UEsnWf6k4AvVCgw2CBmMGWOZ5DEg0SC7Tg3A9HpCY6n4ynLjkwDw9oG30IIa_3Y-Fz7_ts3EkNJmG7dN9Ga1bKIle4xGJryshyBwHZha5FQJODvcJhvtXpYERojsCxllCYHURTmsvp_pdKbmSkgcGx_CE-JJZwv9We30iUwaXS-RHN5tA6Roh4DvJmyMF3L2jY_zDTLTIU-4v7LBMywi1ruPgsRhBVK2c0ga70HZP5_qoBzTZkYKJQxh9Cw" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 opacity-40 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 blur-[1px] group-hover:blur-0 grayscale group-hover:grayscale-0">
+                        
+                        <div class="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 transition-transform">
+                            <h3 class="text-2xl font-cinzel font-bold text-white mb-2 text-center">Ravenclaw</h3>
+                            <p class="text-gray-400 text-xs text-center opacity-0 group-hover:opacity-100 transition-opacity delay-100 font-sans">Wit beyond measure. Learning and wisdom.</p>
+                        </div>
+                    </div>
+
+                    <!-- Slytherin -->
+                    <div class="reveal-on-scroll house-card group relative h-[400px] overflow-hidden rounded-sm border border-white/10 transition-all duration-500 hover:border-slytherin cursor-pointer" style="transition-delay: 300ms;">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slytherin/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFal4s4xdw3DgSM9CXx5PrtI1eHVcmgwhJg_knOYQJTemLsXstN-vZtt6vI8bM1megzwKKjYmWQSMMV0EyUekVqCQW-5zTWbSFHhHu2YFM6MNCuYrBTa1DWrDsaiXuETM2GjQBxlqUiXF5-D8Kjk1MHPAsqo-nXXJedyFS_XsHGopmQk42TkOfi1cR6aj8XEBhJA6cMY58rzBgmjya2QYW7TKAUoptHrRo1dqvOFzLKpO-QavIqTadkREkwPqcZ5Tlt4kukauTrA" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 opacity-40 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 blur-[1px] group-hover:blur-0 grayscale group-hover:grayscale-0">
+                        
+                        <div class="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 transition-transform">
+                            <h3 class="text-2xl font-cinzel font-bold text-white mb-2 text-center">Slytherin</h3>
+                            <p class="text-gray-400 text-xs text-center opacity-0 group-hover:opacity-100 transition-opacity delay-100 font-sans">Cunning folk. Use any means to achieve their ends.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Tracks Section -->
+        <section id="tracks" class="py-20 border-t border-white/10 relative">
+            <div class="container mx-auto px-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    <div>
+                        <h2 class="reveal-on-scroll text-4xl md:text-5xl font-cinzel font-bold mb-8 text-gold">Magical Tracks</h2>
+                        <div class="space-y-6">
+                            <!-- Track 1 -->
+                            <div class="reveal-on-scroll flex gap-6 p-6 border-l-2 border-white/10 hover:border-gold hover:bg-white/5 transition-all duration-300 group cursor-pointer" style="transition-delay: 100ms;">
+                                <div class="mt-1">
+                                    <i data-lucide="flask-conical" class="w-8 h-8 text-gold/60 group-hover:text-gold transition-colors"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-cinzel font-bold text-white mb-2 group-hover:text-gold transition-colors">Potions & Alchemy</h3>
+                                    <p class="text-gray-400 font-sans">Brewing the future of HealthTech and Biotech. Create solutions that heal.</p>
+                                </div>
+                            </div>
+                            <!-- Track 2 -->
+                            <div class="reveal-on-scroll flex gap-6 p-6 border-l-2 border-white/10 hover:border-gold hover:bg-white/5 transition-all duration-300 group cursor-pointer" style="transition-delay: 200ms;">
+                                <div class="mt-1">
+                                    <i data-lucide="shield" class="w-8 h-8 text-gold/60 group-hover:text-gold transition-colors"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-cinzel font-bold text-white mb-2 group-hover:text-gold transition-colors">Defense Against Dark Arts</h3>
+                                    <p class="text-gray-400 font-sans">Cybersecurity & Privacy. Protect the realm from digital threats.</p>
+                                </div>
+                            </div>
+                            <!-- Track 3 -->
+                            <div class="reveal-on-scroll flex gap-6 p-6 border-l-2 border-white/10 hover:border-gold hover:bg-white/5 transition-all duration-300 group cursor-pointer" style="transition-delay: 300ms;">
+                                <div class="mt-1">
+                                    <i data-lucide="eye" class="w-8 h-8 text-gold/60 group-hover:text-gold transition-colors"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-cinzel font-bold text-white mb-2 group-hover:text-gold transition-colors">Divination</h3>
+                                    <p class="text-gray-400 font-sans">Predictive AI & Machine Learning. See the future through data.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Decorative Element -->
+                    <div class="reveal-on-scroll relative h-[500px] border border-gold/20 flex items-center justify-center p-8 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gold/5 to-transparent" style="transition-delay: 200ms;">
+                        <div class="text-center">
+                            <i data-lucide="feather" class="w-24 h-24 text-gold mx-auto mb-6 opacity-80"></i>
+                            <p class="font-map text-3xl text-gold/80 italic leading-relaxed">
+                                "Words are, in my not-so-humble opinion, our most inexhaustible source of magic."
+                            </p>
+                            <p class="font-cinzel text-sm text-gold/50 mt-4 uppercase tracking-widest">- Albus Dumbledore</p>
+                        </div>
+                        
+                        <!-- Corner Decorations -->
+                        <div class="absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 border-gold/40"></div>
+                        <div class="absolute top-0 right-0 w-16 h-16 border-t-2 border-r-2 border-gold/40"></div>
+                        <div class="absolute bottom-0 left-0 w-16 h-16 border-b-2 border-l-2 border-gold/40"></div>
+                        <div class="absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 border-gold/40"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Leaderboard Section -->
+        <section id="leaderboard" class="py-32 relative bg-parchment">
+             <!-- Torn Paper Edge Effect Top -->
+             <div class="absolute top-0 left-0 right-0 h-12 bg-[#050505]" style="clip-path: polygon(0 0, 100% 0, 100% 40%, 0 100%);"></div>
+
+             <div class="container mx-auto px-6 max-w-4xl relative z-10">
+                <div class="reveal-on-scroll text-center mb-12">
+                    <h2 class="text-5xl font-map font-bold mb-4 text-ink">The House Cup</h2>
+                    <p class="text-ink/70 font-map italic text-lg">Points awarded for coding, collaboration, and creativity.</p>
+                </div>
+
+                <div class="reveal-on-scroll bg-white/40 backdrop-blur-sm border border-ink/10 p-10 shadow-xl relative overflow-hidden">
+                    <!-- Background Stain -->
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-ink/5 rounded-full blur-3xl pointer-events-none"></div>
+
+                    <!-- Row 1: Ravenclaw -->
+                    <div class="relative mb-8 last:mb-0">
+                        <div class="flex items-center gap-4 mb-2">
+                            <span class="font-cinzel font-bold text-ink w-32">Ravenclaw</span>
+                            <span class="text-ink font-map font-bold ml-auto">1,480</span>
+                        </div>
+                        <div class="h-6 w-full bg-ink/10 rounded-full overflow-hidden border border-ink/10">
+                            <div class="progress-bar h-full relative bg-ravenclaw" data-width="92%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Slytherin -->
+                    <div class="relative mb-8 last:mb-0">
+                        <div class="flex items-center gap-4 mb-2">
+                            <span class="font-cinzel font-bold text-ink w-32">Slytherin</span>
+                            <span class="text-ink font-map font-bold ml-auto">1,360</span>
+                        </div>
+                        <div class="h-6 w-full bg-ink/10 rounded-full overflow-hidden border border-ink/10">
+                            <div class="progress-bar h-full relative bg-slytherin" data-width="85%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Gryffindor -->
+                    <div class="relative mb-8 last:mb-0">
+                        <div class="flex items-center gap-4 mb-2">
+                            <span class="font-cinzel font-bold text-ink w-32">Gryffindor</span>
+                            <span class="text-ink font-map font-bold ml-auto">1,250</span>
+                        </div>
+                        <div class="h-6 w-full bg-ink/10 rounded-full overflow-hidden border border-ink/10">
+                            <div class="progress-bar h-full relative bg-gryffindor" data-width="78%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Row 4: Hufflepuff -->
+                    <div class="relative mb-8 last:mb-0">
+                        <div class="flex items-center gap-4 mb-2">
+                            <span class="font-cinzel font-bold text-ink w-32">Hufflepuff</span>
+                            <span class="text-ink font-map font-bold ml-auto">1,200</span>
+                        </div>
+                        <div class="h-6 w-full bg-ink/10 rounded-full overflow-hidden border border-ink/10">
+                            <div class="progress-bar h-full relative bg-hufflepuff" data-width="75%"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+             <!-- Torn Paper Edge Effect Bottom -->
+             <div class="absolute bottom-0 left-0 right-0 h-12 bg-[#050505]" style="clip-path: polygon(0 100%, 100% 100%, 100% 0, 0 60%);"></div>
+        </section>
+
+        <!-- TEAM SECTION: THE ORDER OF THE GDG -->
+        <section id="team" class="py-24 relative bg-[#050505] overflow-hidden">
+            <!-- Background Elements -->
+            <div class="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-gold/10 to-transparent"></div>
+            <div class="absolute top-0 right-1/4 w-px h-full bg-gradient-to-b from-transparent via-gold/10 to-transparent"></div>
+
+            <div class="container mx-auto px-6 relative z-10">
+                <div class="reveal-on-scroll text-center mb-16">
+                    <span class="text-gold/60 font-cinzel tracking-[0.2em] text-xs uppercase mb-2 block">The Architects</span>
+                    <h2 class="text-4xl md:text-5xl font-cinzel font-bold mb-6 text-white">The Order of the GDG</h2>
+                    <p class="text-gray-400 font-map italic text-xl max-w-2xl mx-auto">"Happiness can be found, even in the darkest of times, if one only remembers to turn on the light."</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    
+                    <!-- Team Member 1 -->
+                    <div class="reveal-on-scroll group relative" style="transition-delay: 100ms;">
+                        <!-- Portrait Frame -->
+                        <div class="relative overflow-hidden aspect-[3/4] border border-white/10 rounded-sm bg-white/5 transition-all duration-500 group-hover:border-gold/50 group-hover:shadow-[0_0_30px_rgba(197,160,89,0.15)]">
+                            <!-- Image (Grayscale to Color) -->
+                            <img src="bhawesh_choudhary_JKECbX3.webp" alt="Team Member" class="object-cover w-full h-full filter grayscale sepia-[0.5] brightness-75 contrast-125 group-hover:filter-none group-hover:scale-105 transition-all duration-700 ease-out">
+                            
+                            <!-- Magical Overlay -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-80"></div>
+                            
+                            <!-- Corner Ornaments -->
+                            <div class="absolute top-2 left-2 w-4 h-4 border-t border-l border-gold/30 transition-all duration-300 group-hover:w-full group-hover:h-full group-hover:border-gold/10"></div>
+                            <div class="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-gold/30 transition-all duration-300 group-hover:w-full group-hover:h-full group-hover:border-gold/10"></div>
+                        </div>
+
+                        <!-- Info Plate -->
+                        <div class="absolute bottom-6 left-0 right-0 text-center transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500 px-4">
+                            <h3 class="text-xl font-cinzel font-bold text-white mb-1 drop-shadow-lg">Bhawesh Choudhary</h3>
+                            <div class="w-8 h-px bg-gold/50 mx-auto mb-2 transition-all duration-500 group-hover:w-16"></div>
+                            <p class="text-gold text-xs font-bold tracking-widest uppercase mb-1">Lead Organizer</p>
+                            <p class="text-gray-500 font-map italic text-sm">"Headmaster"</p>
+                        </div>
+                    </div>
+
+                    <!-- Team Member 2 -->
+                    <div class="reveal-on-scroll group relative" style="transition-delay: 200ms;">
+                        <div class="relative overflow-hidden aspect-[3/4] border border-white/10 rounded-sm bg-white/5 transition-all duration-500 group-hover:border-gold/50 group-hover:shadow-[0_0_30px_rgba(197,160,89,0.15)]">
+                            <img src="Kartik2.jpeg" alt="Team Member" class="object-cover w-full h-full filter grayscale sepia-[0.5] brightness-75 contrast-125 group-hover:filter-none group-hover:scale-105 transition-all duration-700 ease-out">
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-80"></div>
+                            <div class="absolute top-2 left-2 w-4 h-4 border-t border-l border-gold/30 transition-all duration-300 group-hover:w-full group-hover:h-full group-hover:border-gold/10"></div>
+                            <div class="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-gold/30 transition-all duration-300 group-hover:w-full group-hover:h-full group-hover:border-gold/10"></div>
+                        </div>
+                        <div class="absolute bottom-6 left-0 right-0 text-center transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500 px-4">
+                            <h3 class="text-xl font-cinzel font-bold text-white mb-1 drop-shadow-lg">Singupalli Kartik</h3>
+                            <div class="w-8 h-px bg-gold/50 mx-auto mb-2 transition-all duration-500 group-hover:w-16"></div>
+                            <p class="text-gold text-xs font-bold tracking-widest uppercase mb-1">Technical Head</p>
+                            <p class="text-gray-500 font-map italic text-sm">"Transfiguration Professor"</p>
+                        </div>
+                    </div>
+
+                    <!-- Team Member 3 -->
+                    <div class="reveal-on-scroll group relative" style="transition-delay: 300ms;">
+                        <div class="relative overflow-hidden aspect-[3/4] border border-white/10 rounded-sm bg-white/5 transition-all duration-500 group-hover:border-gold/50 group-hover:shadow-[0_0_30px_rgba(197,160,89,0.15)]">
+                            <img src="IshanMathur.jpeg" alt="Team Member" class="object-cover w-full h-full filter grayscale sepia-[0.5] brightness-75 contrast-125 group-hover:filter-none group-hover:scale-105 transition-all duration-700 ease-out">
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-80"></div>
+                            <div class="absolute top-2 left-2 w-4 h-4 border-t border-l border-gold/30 transition-all duration-300 group-hover:w-full group-hover:h-full group-hover:border-gold/10"></div>
+                            <div class="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-gold/30 transition-all duration-300 group-hover:w-full group-hover:h-full group-hover:border-gold/10"></div>
+                        </div>
+                        <div class="absolute bottom-6 left-0 right-0 text-center transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500 px-4">
+                            <h3 class="text-xl font-cinzel font-bold text-white mb-1 drop-shadow-lg">Ishan Mathur</h3>
+                            <div class="w-8 h-px bg-gold/50 mx-auto mb-2 transition-all duration-500 group-hover:w-16"></div>
+                            <p class="text-gold text-xs font-bold tracking-widest uppercase mb-1">Operations Head</p>
+                            <p class="text-gray-500 font-map italic text-sm">"Potions Master"</p>
+                        </div>
+                    </div>
+
+                    <!-- Team Member 4 -->
+                    <div class="reveal-on-scroll group relative" style="transition-delay: 400ms;">
+                        <div class="relative overflow-hidden aspect-[3/4] border border-white/10 rounded-sm bg-white/5 transition-all duration-500 group-hover:border-gold/50 group-hover:shadow-[0_0_30px_rgba(197,160,89,0.15)]">
+                            <img src="DIshaPatidar.jpg" alt="Team Member" class="object-cover w-full h-full filter grayscale sepia-[0.5] brightness-75 contrast-125 group-hover:filter-none group-hover:scale-105 transition-all duration-700 ease-out">
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-80"></div>
+                            <div class="absolute top-2 left-2 w-4 h-4 border-t border-l border-gold/30 transition-all duration-300 group-hover:w-full group-hover:h-full group-hover:border-gold/10"></div>
+                            <div class="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-gold/30 transition-all duration-300 group-hover:w-full group-hover:h-full group-hover:border-gold/10"></div>
+                        </div>
+                        <div class="absolute bottom-6 left-0 right-0 text-center transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500 px-4">
+                            <h3 class="text-xl font-cinzel font-bold text-white mb-1 drop-shadow-lg">Disha Patidar</h3>
+                            <div class="w-8 h-px bg-gold/50 mx-auto mb-2 transition-all duration-500 group-hover:w-16"></div>
+                            <p class="text-gold text-xs font-bold tracking-widest uppercase mb-1">Creative Head</p>
+                            <p class="text-gray-500 font-map italic text-sm">"Charms Expert"</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-[#050505] py-12 border-t border-white/10">
+            <div class="container mx-auto px-6 text-center">
+                <i data-lucide="sparkles" class="w-6 h-6 text-gold mx-auto mb-4"></i>
+                <h3 class="font-cinzel font-bold text-white text-xl mb-6">GDGC UIT</h3>
+                
+                <div class="flex justify-center gap-8 mb-8">
+                    <a href="#" class="text-gray-500 hover:text-gold transition-colors font-cinzel text-sm">Owls</a>
+                    <a href="#" class="text-gray-500 hover:text-gold transition-colors font-cinzel text-sm">Ministry</a>
+                    <a href="#" class="text-gray-500 hover:text-gold transition-colors font-cinzel text-sm">Prophet</a>
+                </div>
+
+                <p class="text-gray-600 text-xs font-sans">© 2024 GDGC UIT. Nitwit! Blubber! Oddment! Tweak!</p>
+            </div>
+        </footer>
+    </main>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Lumos Cursor Effect
+        const cursor = document.getElementById('lumos-cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.setProperty('--x', e.clientX + 'px');
+            cursor.style.setProperty('--y', e.clientY + 'px');
+        });
+
+        // Navbar Scroll Effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('bg-[#050505]/90', 'backdrop-blur-lg', 'border-b', 'border-gold/20', 'py-4');
+                navbar.classList.remove('py-6');
+            } else {
+                navbar.classList.remove('bg-[#050505]/90', 'backdrop-blur-lg', 'border-b', 'border-gold/20', 'py-4');
+                navbar.classList.add('py-6');
+            }
+        });
+
+        // Intersection Observer for Animations
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    
+                    const progressBar = entry.target.querySelector('.progress-bar');
+                    if (progressBar) {
+                        progressBar.style.width = progressBar.getAttribute('data-width');
+                    } else if (entry.target.classList.contains('progress-bar')) {
+                        entry.target.style.width = entry.target.getAttribute('data-width');
+                    }
+                    
+                    observer.unobserve(entry.target); 
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
+        document.querySelectorAll('.progress-bar').forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>
