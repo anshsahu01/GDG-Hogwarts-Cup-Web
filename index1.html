@@ -39,6 +39,7 @@
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
                         'footprints': 'footprints 4s linear infinite',
+                        'flutter': 'flutter 0.1s linear infinite',
                     },
                     keyframes: {
                         float: {
@@ -48,6 +49,10 @@
                         footprints: {
                             '0%': { strokeDashoffset: '1000' },
                             '100%': { strokeDashoffset: '0' }
+                        },
+                        flutter: {
+                            '0%, 100%': { transform: 'scaleY(1)' },
+                            '50%': { transform: 'scaleY(0.5)' },
                         }
                     }
                 }
@@ -60,11 +65,59 @@
             background-color: #050505;
             color: white;
             overflow-x: hidden;
+            cursor: none; /* Hide default cursor */
         }
 
-        /* Lumos Cursor Effect */
-        #lumos-cursor {
-            background: radial-gradient(400px circle at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, 0.1), transparent 60%);
+        /* Custom Cursor - The Golden Snitch */
+        #snitch-cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: top 0.1s ease-out, left 0.1s ease-out;
+            filter: drop-shadow(0 0 8px rgba(197, 160, 89, 0.6));
+        }
+
+        .snitch-body {
+            width: 12px;
+            height: 12px;
+            background: radial-gradient(circle at 30% 30%, #ffd700, #C5A059);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+
+        .snitch-wing {
+            position: absolute;
+            top: 50%;
+            width: 24px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            transform-origin: center;
+            animation: flutter 0.08s infinite alternate;
+        }
+
+        .wing-left {
+            left: -20px;
+            transform-origin: right center;
+        }
+
+        .wing-right {
+            right: -20px;
+            transform-origin: left center;
+        }
+
+        /* Lumos Glow (Secondary Cursor) */
+        #lumos-glow {
+            background: radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, 0.08), transparent 50%);
             position: fixed;
             inset: 0;
             pointer-events: none;
@@ -77,6 +130,62 @@
             background-color: #dcbfa6;
             background-image: url("https://www.transparenttextures.com/patterns/aged-paper.png");
             box-shadow: inset 0 0 150px rgba(0,0,0,0.5);
+        }
+
+        /* Improved Map Background */
+        .bg-marauder {
+            background-color: #d4c4a8;
+            background-image:
+                url("https://www.transparenttextures.com/patterns/aged-paper.png"),
+                repeating-linear-gradient(90deg, transparent 0, transparent 198px, rgba(0,0,0,0.05) 199px, transparent 200px);
+                /* Fold lines simulation */
+            box-shadow: inset 0 0 200px rgba(44, 24, 16, 0.4);
+        }
+
+        /* Gem Bar Effects for House Cup */
+        .gem-bar {
+            position: relative;
+            overflow: hidden;
+            border-radius: 99px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.4);
+        }
+
+        .gem-fill {
+            height: 100%;
+            width: 0; /* Animated by JS */
+            transition: width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+
+        .gem-fill::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: linear-gradient(
+                45deg,
+                rgba(255,255,255,0.1) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255,255,255,0.1) 50%,
+                rgba(255,255,255,0.1) 75%,
+                transparent 75%,
+                transparent
+            );
+            background-size: 20px 20px;
+            opacity: 0.3;
+        }
+
+        .gem-gryffindor { background: linear-gradient(180deg, #9e1b32 0%, #740001 50%, #4a0001 100%); box-shadow: 0 0 10px #740001; }
+        .gem-slytherin { background: linear-gradient(180deg, #2a623d 0%, #1a472a 50%, #0e2f1a 100%); box-shadow: 0 0 10px #1a472a; }
+        .gem-ravenclaw { background: linear-gradient(180deg, #222f5b 0%, #0e1a40 50%, #060b20 100%); box-shadow: 0 0 10px #0e1a40; }
+        .gem-hufflepuff { background: linear-gradient(180deg, #f0c75e 0%, #ecb939 50%, #c49216 100%); box-shadow: 0 0 10px #ecb939; }
+
+        .glass-tube {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow:
+                inset 0 0 10px rgba(0,0,0,0.2),
+                0 0 0 1px rgba(0,0,0,0.1);
         }
 
         /* Ink Reveal Animation */
@@ -116,8 +225,15 @@
 </head>
 <body class="antialiased selection:bg-gold/30 selection:text-white">
 
-    <!-- Lumos Cursor -->
-    <div id="lumos-cursor"></div>
+    <!-- Golden Snitch Cursor -->
+    <div id="snitch-cursor">
+        <div class="wing-left snitch-wing"></div>
+        <div class="snitch-body"></div>
+        <div class="wing-right snitch-wing"></div>
+    </div>
+
+    <!-- Lumos Glow -->
+    <div id="lumos-glow"></div>
 
     <!-- Background Ambience -->
     <div class="fixed inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none z-0"></div>
@@ -410,69 +526,79 @@
             </div>
         </section>
 
-        <!-- Leaderboard Section -->
-        <section id="leaderboard" class="py-32 relative bg-parchment">
-             <!-- Torn Paper Edge Effect Top -->
-             <div class="absolute top-0 left-0 right-0 h-12 bg-[#050505]" style="clip-path: polygon(0 0, 100% 0, 100% 40%, 0 100%);"></div>
+  <!-- Redesigned Leaderboard (House Cup) -->
+        <section id="leaderboard" class="py-32 relative bg-marauder">
+             <div class="absolute top-0 left-0 right-0 h-16 bg-[#050505]" style="clip-path: polygon(0 0, 100% 0, 100% 40%, 0 100%);"></div>
 
-             <div class="container mx-auto px-6 max-w-4xl relative z-10">
-                <div class="reveal-on-scroll text-center mb-12">
-                    <h2 class="text-5xl font-map font-bold mb-4 text-ink">The House Cup</h2>
-                    <p class="text-ink/70 font-map italic text-lg">Points awarded for coding, collaboration, and creativity.</p>
+             <div class="container mx-auto px-6 max-w-5xl relative z-10">
+                <div class="reveal-on-scroll text-center mb-16">
+                    <h2 class="text-6xl font-map font-bold mb-4 text-ink drop-shadow-md">The House Cup</h2>
+                    <p class="text-ink/70 font-serif italic text-2xl">"While you're at Hogwarts, your triumphs will earn you house points."</p>
                 </div>
 
-                <div class="reveal-on-scroll bg-white/40 backdrop-blur-sm border border-ink/10 p-10 shadow-xl relative overflow-hidden">
-                    <!-- Background Stain -->
-                    <div class="absolute top-0 right-0 w-64 h-64 bg-ink/5 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="reveal-on-scroll glass-tube p-12 rounded-xl backdrop-blur-md relative overflow-hidden shadow-2xl">
+                    
+                    <div class="space-y-12">
+                        <!-- Ravenclaw Bar -->
+                        <div class="relative group">
+                            <div class="flex items-end justify-between mb-2">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-4xl font-bold text-ink/80 font-cinzel">1</span>
+                                    <span class="font-cinzel font-bold text-2xl text-ink">Ravenclaw</span>
+                                </div>
+                                <span class="text-ink font-map font-bold text-3xl group-hover:scale-110 transition-transform">1,480</span>
+                            </div>
+                            <div class="h-10 w-full bg-black/10 rounded-full gem-bar">
+                                <div class="gem-fill gem-ravenclaw rounded-full" data-width="92%"></div>
+                            </div>
+                        </div>
 
-                    <!-- Row 1: Ravenclaw -->
-                    <div class="relative mb-8 last:mb-0">
-                        <div class="flex items-center gap-4 mb-2">
-                            <span class="font-cinzel font-bold text-ink w-32">Ravenclaw</span>
-                            <span class="text-ink font-map font-bold ml-auto">1,480</span>
+                        <!-- Slytherin Bar -->
+                        <div class="relative group">
+                            <div class="flex items-end justify-between mb-2">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-4xl font-bold text-ink/80 font-cinzel">2</span>
+                                    <span class="font-cinzel font-bold text-2xl text-ink">Slytherin</span>
+                                </div>
+                                <span class="text-ink font-map font-bold text-3xl group-hover:scale-110 transition-transform">1,360</span>
+                            </div>
+                            <div class="h-10 w-full bg-black/10 rounded-full gem-bar">
+                                <div class="gem-fill gem-slytherin rounded-full" data-width="85%"></div>
+                            </div>
                         </div>
-                        <div class="h-6 w-full bg-ink/10 rounded-full overflow-hidden border border-ink/10">
-                            <div class="progress-bar h-full relative bg-ravenclaw" data-width="92%"></div>
-                        </div>
-                    </div>
 
-                    <!-- Row 2: Slytherin -->
-                    <div class="relative mb-8 last:mb-0">
-                        <div class="flex items-center gap-4 mb-2">
-                            <span class="font-cinzel font-bold text-ink w-32">Slytherin</span>
-                            <span class="text-ink font-map font-bold ml-auto">1,360</span>
+                        <!-- Gryffindor Bar -->
+                        <div class="relative group">
+                            <div class="flex items-end justify-between mb-2">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-4xl font-bold text-ink/80 font-cinzel">3</span>
+                                    <span class="font-cinzel font-bold text-2xl text-ink">Gryffindor</span>
+                                </div>
+                                <span class="text-ink font-map font-bold text-3xl group-hover:scale-110 transition-transform">1,250</span>
+                            </div>
+                            <div class="h-10 w-full bg-black/10 rounded-full gem-bar">
+                                <div class="gem-fill gem-gryffindor rounded-full" data-width="78%"></div>
+                            </div>
                         </div>
-                        <div class="h-6 w-full bg-ink/10 rounded-full overflow-hidden border border-ink/10">
-                            <div class="progress-bar h-full relative bg-slytherin" data-width="85%"></div>
-                        </div>
-                    </div>
 
-                    <!-- Row 3: Gryffindor -->
-                    <div class="relative mb-8 last:mb-0">
-                        <div class="flex items-center gap-4 mb-2">
-                            <span class="font-cinzel font-bold text-ink w-32">Gryffindor</span>
-                            <span class="text-ink font-map font-bold ml-auto">1,250</span>
-                        </div>
-                        <div class="h-6 w-full bg-ink/10 rounded-full overflow-hidden border border-ink/10">
-                            <div class="progress-bar h-full relative bg-gryffindor" data-width="78%"></div>
-                        </div>
-                    </div>
-
-                    <!-- Row 4: Hufflepuff -->
-                    <div class="relative mb-8 last:mb-0">
-                        <div class="flex items-center gap-4 mb-2">
-                            <span class="font-cinzel font-bold text-ink w-32">Hufflepuff</span>
-                            <span class="text-ink font-map font-bold ml-auto">1,200</span>
-                        </div>
-                        <div class="h-6 w-full bg-ink/10 rounded-full overflow-hidden border border-ink/10">
-                            <div class="progress-bar h-full relative bg-hufflepuff" data-width="75%"></div>
+                        <!-- Hufflepuff Bar -->
+                        <div class="relative group">
+                            <div class="flex items-end justify-between mb-2">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-4xl font-bold text-ink/80 font-cinzel">4</span>
+                                    <span class="font-cinzel font-bold text-2xl text-ink">Hufflepuff</span>
+                                </div>
+                                <span class="text-ink font-map font-bold text-3xl group-hover:scale-110 transition-transform">1,200</span>
+                            </div>
+                            <div class="h-10 w-full bg-black/10 rounded-full gem-bar">
+                                <div class="gem-fill gem-hufflepuff rounded-full" data-width="75%"></div>
+                            </div>
                         </div>
                     </div>
 
                 </div>
             </div>
-             <!-- Torn Paper Edge Effect Bottom -->
-             <div class="absolute bottom-0 left-0 right-0 h-12 bg-[#050505]" style="clip-path: polygon(0 100%, 100% 100%, 100% 0, 0 60%);"></div>
+             <div class="absolute bottom-0 left-0 right-0 h-16 bg-[#050505]" style="clip-path: polygon(0 100%, 100% 100%, 100% 0, 0 60%);"></div>
         </section>
 
         <!-- TEAM SECTION: THE ORDER OF THE GDG -->
@@ -563,14 +689,82 @@
                     </div>
 
                 </div>
+
+
+                <!-- DUMBLEDORE'S ARMY (Extended Team) -->
+                <div class="border-t border-white/10 pt-20">
+                     <div class="reveal-on-scroll text-center mb-16">
+                        <span class="text-gold/60 font-cinzel tracking-[0.2em] text-xs uppercase mb-2 block">The Volunteers</span>
+                        <h2 class="text-3xl md:text-4xl font-cinzel font-bold mb-6 text-white">Dumbledore's Army</h2>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                        <!-- Army Member 1 -->
+                        <div class="reveal-on-scroll text-center group cursor-none">
+                            <div class="w-24 h-24 mx-auto rounded-full overflow-hidden border-2 border-white/10 group-hover:border-gold transition-colors mb-4">
+                                <img src="https://ik.imagekit.io/anshsahu1/AshiYadav.jpeg" class="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all">
+                            </div>
+                            <h4 class="text-white font-cinzel font-bold text-sm">Ashi Yadav</h4>
+                            <p class="text-gray-500 text-xs font-serif italic">Seeker</p>
+                        </div>
+                        
+                        <!-- Army Member 2 -->
+                        <div class="reveal-on-scroll text-center group cursor-none" style="transition-delay: 50ms;">
+                            <div class="w-24 h-24 mx-auto rounded-full overflow-hidden border-2 border-white/10 group-hover:border-gold transition-colors mb-4">
+                                <img src="https://ik.imagekit.io/anshsahu1/DivyanshiDubey.jpeg" class="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all">
+                            </div>
+                            <h4 class="text-white font-cinzel font-bold text-sm">Divyansh Dubey</h4>
+                            <p class="text-gray-500 text-xs font-serif italic">Prefect</p>
+                        </div>
+
+                         <!-- Army Member 3 -->
+                         <div class="reveal-on-scroll text-center group cursor-none" style="transition-delay: 100ms;">
+                            <div class="w-24 h-24 mx-auto rounded-full overflow-hidden border-2 border-white/10 group-hover:border-gold transition-colors mb-4">
+                                <img src="https://ik.imagekit.io/anshsahu1/Madhav.jpg" class="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all">
+                            </div>
+                            <h4 class="text-white font-cinzel font-bold text-sm">Madhav Gupta </h4>
+                            <p class="text-gray-500 text-xs font-serif italic">Keeper</p>
+                        </div>
+
+                         <!-- Army Member 4 -->
+                         <div class="reveal-on-scroll text-center group cursor-none" style="transition-delay: 150ms;">
+                            <div class="w-24 h-24 mx-auto rounded-full overflow-hidden border-2 border-white/10 group-hover:border-gold transition-colors mb-4">
+                                <img src="https://ik.imagekit.io/anshsahu1/ANSH1.jpeg" class="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all">
+                            </div>
+                            <h4 class="text-white font-cinzel font-bold text-sm">Ansh Sahu</h4>
+                            <p class="text-gray-500 text-xs font-serif italic">Herbology</p>
+                        </div>
+
+                         <!-- Army Member 5 -->
+                         <div class="reveal-on-scroll text-center group cursor-none" style="transition-delay: 200ms;">
+                            <div class="w-24 h-24 mx-auto rounded-full overflow-hidden border-2 border-white/10 group-hover:border-gold transition-colors mb-4">
+                                <img src="https://ik.imagekit.io/anshsahu1/Aryan%20.jpeg" class="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all">
+                            </div>
+                            <h4 class="text-white font-cinzel font-bold text-sm">Aryan Kushwaha</h4>
+                            <p class="text-gray-500 text-xs font-serif italic">Chaser</p>
+                        </div>
+
+                         <!-- Army Member 6
+                         <div class="reveal-on-scroll text-center group cursor-none" style="transition-delay: 250ms;">
+                            <div class="w-24 h-24 mx-auto rounded-full overflow-hidden border-2 border-white/10 group-hover:border-gold transition-colors mb-4">
+                                <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=300&auto=format&fit=crop" class="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all">
+                            </div>
+                            <h4 class="text-white font-cinzel font-bold text-sm">Draco M.</h4>
+                            <p class="text-gray-500 text-xs font-serif italic">Seeker</p>
+                        </div> -->
+
+                    </div>
             </div>
         </section>
 
         <!-- Footer -->
         <footer class="bg-[#050505] py-12 border-t border-white/10">
             <div class="container mx-auto px-6 text-center">
-                <i data-lucide="sparkles" class="w-6 h-6 text-gold mx-auto mb-4"></i>
-                <h3 class="font-cinzel font-bold text-white text-xl mb-6">GDGC UIT</h3>
+                <!-- <i data-lucide="sparkles" class="w-6 h-6 text-gold mx-auto mb-4"></i> -->
+                 <!-- <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 3L2 12L8 21M16 3L22 12L16 21" stroke="#FFD700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg> -->
+                <h3 class="font-cinzel font-bold text-white text-xl mb-6"> GDGC UIT</h3>
                 
                 <div class="flex justify-center gap-8 mb-8">
                     <a href="#" class="text-gray-500 hover:text-gold transition-colors font-cinzel text-sm">Owls</a>
@@ -587,12 +781,41 @@
         // Initialize Lucide Icons
         lucide.createIcons();
 
-        // Lumos Cursor Effect
-        const cursor = document.getElementById('lumos-cursor');
+        // --- THE GOLDEN SNITCH CURSOR LOGIC ---
+        const cursor = document.getElementById('snitch-cursor');
+        const lumos = document.getElementById('lumos-glow');
+
+        // Target position (mouse)
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+
+        // Current position (snitch)
+        let snitchX = window.innerWidth / 2;
+        let snitchY = window.innerHeight / 2;
+
         document.addEventListener('mousemove', (e) => {
-            cursor.style.setProperty('--x', e.clientX + 'px');
-            cursor.style.setProperty('--y', e.clientY + 'px');
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            // Update Lumos immediately
+            lumos.style.setProperty('--x', e.clientX + 'px');
+            lumos.style.setProperty('--y', e.clientY + 'px');
         });
+
+        // Animation Loop for Smooth Follow (Lerp)
+        function animateSnitch() {
+            // Speed factor (0.1 = slow/floaty, 0.5 = fast)
+            const speed = 0.15;
+
+            snitchX += (mouseX - snitchX) * speed;
+            snitchY += (mouseY - snitchY) * speed;
+
+            cursor.style.left = snitchX + 'px';
+            cursor.style.top = snitchY + 'px';
+
+            requestAnimationFrame(animateSnitch);
+        }
+        animateSnitch();
 
         // Navbar Scroll Effect
         const navbar = document.getElementById('navbar');
@@ -617,21 +840,21 @@
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('is-visible');
-                    
-                    const progressBar = entry.target.querySelector('.progress-bar');
-                    if (progressBar) {
-                        progressBar.style.width = progressBar.getAttribute('data-width');
-                    } else if (entry.target.classList.contains('progress-bar')) {
+
+                    const gemFill = entry.target.querySelector('.gem-fill');
+                    if (gemFill) {
+                        gemFill.style.width = gemFill.getAttribute('data-width');
+                    } else if (entry.target.classList.contains('gem-fill')) {
                         entry.target.style.width = entry.target.getAttribute('data-width');
                     }
-                    
-                    observer.unobserve(entry.target); 
+
+                    observer.unobserve(entry.target);
                 }
             });
         }, observerOptions);
 
         document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
-        document.querySelectorAll('.progress-bar').forEach(el => observer.observe(el));
+        document.querySelectorAll('.gem-fill').forEach(el => observer.observe(el));
     </script>
 </body>
 </html>
