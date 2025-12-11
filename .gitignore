@@ -1,0 +1,19 @@
+# Image files
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.svg
+*.webp
+*.ico
+
+# Environment files
+.env
+.env.local
+
+# Node modules (if using npm)
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
