@@ -247,9 +247,6 @@
                 <a href="#map" class="block text-sm font-cinzel font-semibold text-gray-400 hover:text-gold transition-colors py-2">The Map</a>
                 <a href="#houses" class="block text-sm font-cinzel font-semibold text-gray-400 hover:text-gold transition-colors py-2">Houses</a>
                 <a href="#tracks" class="block text-sm font-cinzel font-semibold text-gray-400 hover:text-gold transition-colors py-2">Tracks</a>
-                <a href="https://vision.hack2skill.com/event/gdgoc-25-spell-hacks-uitrgpv" class="block w-full px-8 py-2 border border-gold/30 text-gold font-cinzel font-bold text-sm hover:bg-gold hover:text-black transition-all duration-300 tracking-wider text-center">
-                    Register
-                </a>
             </div>
         </div>
     </nav>
@@ -277,9 +274,14 @@
                 </p>
 
                 <div class="reveal-on-scroll flex flex-col sm:flex-row items-center justify-center gap-6" style="transition-delay: 300ms;">
-                    <a href="#map" class="group relative px-8 py-4 bg-transparent border border-white/20 text-white font-cinzel tracking-widest overflow-hidden">
+                    <!-- Desktop: Open Map button -->
+                    <a href="#map" class="hidden md:block group relative px-8 py-4 bg-transparent border border-white/20 text-white font-cinzel tracking-widest overflow-hidden">
                         <span class="relative z-10 group-hover:text-black transition-colors duration-300">Open The Map</span>
                         <div class="absolute inset-0 bg-white transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
+                    </a>
+                    <!-- Mobile: Register button -->
+                    <a href="https://vision.hack2skill.com/event/gdgoc-25-spell-hacks-uitrgpv" class="md:hidden inline-block px-8 py-4 bg-transparent border border-gold/30 text-gold font-cinzel font-bold tracking-wider hover:bg-gold hover:text-black transition-all duration-300">
+                        Register
                     </a>
                 </div>
             </div>
